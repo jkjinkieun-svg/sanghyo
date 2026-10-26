@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  주식회사 상효 (SANGHYO CO., LTD.) — 기업 홈페이지
+  ----------------------------------------------------------------------------
+  구조   : 단일 파일 (HTML5 + Tailwind CSS CDN + Vanilla JS)
+  실행   : 브라우저로 index.html 을 열면 바로 동작 (빌드 불필요)
+  섹션   : Header → Hero → About → Business(Features) → Products → Process → Contact → Footer
+  테마   : 라이트/다크 모드 (OS 설정 자동 감지 + 수동 토글, localStorage 저장)
+  컬러   : 메인 딥 네이비(#0A192F, #1B2A4A) / 서브 플래티넘 실버(#E2E8F0, #FFFFFF) / 포인트 티타늄 골드(#D4AF37)
+  ============================================================================
+-->
+<html lang="ko" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ===================== SEO 기본 메타 ===================== -->
+  <title>주식회사 상효 | SANGHYO CO., LTD. — 방송 SI · IT 서비스</title>
+  <meta name="description" content="주식회사 상효는 Teleste 공식 파트너로서 방송·통신 장비와 서버 인프라를 공급하고, 기업을 위한 웹·앱 서비스를 제공하는 미래지향적 기업입니다." />
+  <meta name="keywords" content="주식회사 상효, 상효, SANGHYO, 방송 SI, Teleste, 방송장비, 서버, 웹 개발, 앱 개발, 원장쌤, 학원관리" />
+  <meta name="author" content="주식회사 상효" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.sanghyo.com/" />
+  <meta name="theme-color" content="#0A192F" />
+
+  <!-- Open Graph / 소셜 공유 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta property="og:site_name" content="주식회사 상효" />
+  <meta property="og:title" content="주식회사 상효 — Engineering Trust, Building Tomorrow" />
+  <meta property="og:description" content="방송 SI · IT 서비스. 신뢰를 설계하는 기업, 상효." />
+  <meta property="og:url" content="https://www.sanghyo.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- 파비콘 (인라인 SVG — 별도 파일 요청 없음 → 빠른 로딩) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='70 80 540 570'%3E%3Cpolygon points='340,90 580,225 340,355 100,225' fill='%231B2A4A'/%3E%3Cpolygon points='100,225 340,355 340,635 100,497' fill='%230A192F'/%3E%3Cpolygon points='580,225 340,355 340,635 580,497' fill='%23E2E8F0'/%3E%3Cpath d='M538 112 C430 142 170 210 178 268 C186 330 515 360 516 452 C517 530 260 560 93 605' fill='none' stroke='%23D4AF37' stroke-width='28' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <!-- 구조화 데이터 (검색엔진용 회사 정보) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "주식회사 상효",
+    "alternateName": "SANGHYO CO., LTD.",
+    "url": "https://www.sanghyo.com/",
+    "email": "admin@sanghyo.com",
+    "telephone": "+82-507-1381-4450",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "하늘중앙로 197, 102호(중산동)",
+      "addressLocality": "영종구",
+      "addressRegion": "인천광역시",
+      "addressCountry": "KR"
+    }
+  }
+  </script>
+
+  <!-- ===================== 폰트 (preconnect 로 로딩 최적화) ===================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+
+  <!-- ===================== 테마 깜빡임 방지 (렌더링 전에 실행) ===================== -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('sanghyo-theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // 브랜드 기본 상태는 딥 네이비 → 저장값이 없으면 다크를 기본으로 하되 OS가 라이트면 라이트
+        if (saved === 'dark' || (!saved && prefersDark)) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- ===================== Tailwind CSS (CDN) + 브랜드 토큰 설정 ===================== -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            navy:   { 950: '#060F1F', 900: '#0A192F', 800: '#1B2A4A', 700: '#26385E' }, // 메인
+            silver: { 50: '#FFFFFF', 100: '#F5F7FA', 200: '#E2E8F0', 400: '#94A3B8', 500: '#64748B' }, // 서브
+            gold:   { 300: '#E9CD72', 400: '#DDBE52', 500: '#D4AF37', 600: '#B8952A' }   // 포인트
+          },
+          fontFamily: {
+            sans: ['Inter', '"Noto Sans KR"', 'system-ui', 'sans-serif']
+          },
+          maxWidth: { content: '1200px' },
+          keyframes: {
+            float:   { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-14px)' } },
+            shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+            spinSlow:{ to: { transform: 'rotate(360deg)' } }
+          },
+          animation: {
+            float: 'float 7s ease-in-out infinite',
+            shimmer: 'shimmer 6s linear infinite',
+            'spin-slow': 'spinSlow 40s linear infinite'
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- ===================== 커스텀 CSS (Tailwind로 표현하기 어려운 부분) ===================== -->
+  <style>
+    :root { --gold: #D4AF37; }
+    body { font-feature-settings: "ss01", "cv11"; -webkit-font-smoothing: antialiased; word-break: keep-all; }
+
+    /* 스크롤 등장 애니메이션 — JS가 .is-visible 클래스를 붙임 */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); }
+    .reveal.is-visible { opacity: 1; transform: none; }
+    .reveal[data-delay="1"] { transition-delay: .08s; }
+    .reveal[data-delay="2"] { transition-delay: .16s; }
+    .reveal[data-delay="3"] { transition-delay: .24s; }
+    .reveal[data-delay="4"] { transition-delay: .32s; }
+    .reveal[data-delay="5"] { transition-delay: .40s; }
+
+    /* 티타늄 골드 그라데이션 텍스트 (금속 광택 느낌) */
+    .text-gold-metal {
+      background: linear-gradient(100deg, #B8952A 0%, #F3DE8A 30%, #D4AF37 50%, #F3DE8A 70%, #B8952A 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: shimmer 6s linear infinite;
+    }
+
+    /* 배경 그리드 (도면/설계 느낌) */
+    .bg-grid {
+      background-image:
+        linear-gradient(to right, rgba(148,163,184,.10) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148,163,184,.10) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 40%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 40%, transparent 100%);
+    }
+
+    /* 카드 호버 시 마우스 위치를 따라가는 골드 스포트라이트 (Linear/Vercel 스타일) */
+    .spotlight { position: relative; isolation: isolate; }
+    .spotlight::before {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; opacity: 0; transition: opacity .4s;
+      background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(212,175,55,.14), transparent 60%);
+    }
+    .spotlight:hover::before { opacity: 1; }
+
+    /* 그라데이션 보더 (상단 하이라이트) */
+    .border-gradient { position: relative; }
+    .border-gradient::after {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+      background: linear-gradient(180deg, rgba(212,175,55,.45), rgba(148,163,184,.08) 40%, transparent);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+    }
+
+    /* 헤더 스크롤 시 유리 효과 */
+    .header-scrolled { backdrop-filter: saturate(160%) blur(14px); -webkit-backdrop-filter: saturate(160%) blur(14px); }
+
+    /* 접근성: 모션 최소화 설정 존중 */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+
+<body class="bg-silver-100 text-navy-900 dark:bg-navy-900 dark:text-silver-200 font-sans transition-colors duration-500 overflow-x-hidden">
+
+  <!-- ============================================================
+       로고 SVG 스프라이트 — 헤더/푸터/히어로에서 <use href="#sh-logo">로 재사용
+       구성: 정육면체(土) 3면 + 티타늄 골드 S 곡선(金·水)
+       - 윗면: 딥 네이비 그라데이션 / 왼쪽면: 다크 네이비 / 오른쪽면: 플래티넘 실버
+       - 면 테두리(옅은 실버)는 네이비 배경 위에서도 형태가 보이도록 추가
+       ============================================================ -->
+  <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="shTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1F3157"/><stop offset="1" stop-color="#0E1C38"/></linearGradient>
+      <linearGradient id="shLeft" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B1B33"/><stop offset="1" stop-color="#040B18"/></linearGradient>
+      <linearGradient id="shRight" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1F5F9"/><stop offset="1" stop-color="#CBD5E1"/></linearGradient>
+    </defs>
+    <symbol id="sh-logo" viewBox="70 80 540 570">
+      <polygon points="340,90 580,225 340,355 100,225" fill="url(#shTop)"   stroke="#E2E8F0" stroke-opacity=".16" stroke-width="3" stroke-linejoin="round"/>
+      <polygon points="100,225 340,355 340,635 100,497" fill="url(#shLeft)" stroke="#E2E8F0" stroke-opacity=".16" stroke-width="3" stroke-linejoin="round"/>
+      <polygon points="580,225 340,355 340,635 580,497" fill="url(#shRight)"/>
+      <path d="M538 112 C430 142 170 210 178 268 C186 330 515 360 516 452 C517 530 260 560 93 605"
+            fill="none" stroke="#D4AF37" stroke-width="14" stroke-linecap="round"/>
+    </symbol>
+  </svg>
+
+  <!-- 접근성: 키보드 사용자를 위한 본문 바로가기 -->
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-gold-500 focus:px-4 focus:py-2 focus:text-navy-900 focus:font-semibold">본문 바로가기</a>
+
+  <!-- ============================================================
+       HEADER / 내비게이션
+       - 스크롤 시 반투명 블러 배경
+       - 모바일: 햄버거 메뉴
+       ============================================================ -->
+  <header id="siteHeader" class="fixed inset-x-0 top-0 z-50 transition-all duration-500">
+    <nav class="mx-auto flex h-16 md:h-20 max-w-content items-center justify-between px-5 md:px-8" aria-label="주 메뉴">
+
+      <!-- 로고: 정육면체(土) + 금속 라인(金) + 물결(水) 모티브 -->
+      <a href="#top" class="group flex items-center gap-3" aria-label="주식회사 상효 홈">
+        <!-- 새 로고 심볼 (하단 #sh-logo 스프라이트 재사용) -->
+        <svg class="h-10 w-10 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5" aria-hidden="true"><use href="#sh-logo" /></svg>
+        <span class="leading-tight">
+          <span class="block text-[15px] font-bold tracking-tight">주식회사 상효</span>
+          <span class="block text-[10px] font-semibold tracking-[0.22em] text-silver-500 dark:text-silver-400">SANGHYO CO., LTD.</span>
+        </span>
+      </a>
+
+      <!-- 데스크톱 메뉴 -->
+      <ul class="hidden lg:flex items-center gap-1 text-sm font-medium">
+        <li><a href="#about"    class="nav-link rounded-full px-4 py-2 text-silver-500 hover:text-navy-900 dark:text-silver-400 dark:hover:text-white transition-colors">회사소개</a></li>
+        <li><a href="#business" class="nav-link rounded-full px-4 py-2 text-silver-500 hover:text-navy-900 dark:text-silver-400 dark:hover:text-white transition-colors">사업분야</a></li>
+        <li><a href="#products" class="nav-link rounded-full px-4 py-2 text-silver-500 hover:text-navy-900 dark:text-silver-400 dark:hover:text-white transition-colors">솔루션</a></li>
+        <li><a href="#process"  class="nav-link rounded-full px-4 py-2 text-silver-500 hover:text-navy-900 dark:text-silver-400 dark:hover:text-white transition-colors">진행방식</a></li>
+        <li><a href="#contact"  class="nav-link rounded-full px-4 py-2 text-silver-500 hover:text-navy-900 dark:text-silver-400 dark:hover:text-white transition-colors">문의하기</a></li>
+      </ul>
+
+      <div class="flex items-center gap-2">
+        <!-- 다크모드 토글 -->
+        <button id="themeToggle" type="button" class="grid h-10 w-10 place-items-center rounded-full border border-silver-400/40 hover:border-gold-500 hover:text-gold-500 dark:border-navy-700 dark:hover:text-gold-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500" aria-label="다크 모드 전환">
+          <!-- 해 아이콘 (다크모드일 때 표시) -->
+          <svg class="hidden dark:block h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <!-- 달 아이콘 (라이트모드일 때 표시) -->
+          <svg class="block dark:hidden h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        </button>
+
+        <a href="#contact" class="hidden sm:inline-flex items-center gap-2 rounded-full bg-gold-500 px-5 py-2.5 text-sm font-semibold text-navy-900 hover:bg-gold-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-navy-900">
+          상담 요청
+        </a>
+
+        <!-- 모바일 햄버거 -->
+        <button id="menuBtn" type="button" class="lg:hidden grid h-10 w-10 place-items-center rounded-full border border-silver-400/40 dark:border-navy-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500" aria-controls="mobileMenu" aria-expanded="false" aria-label="메뉴 열기">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path id="menuIcon" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- 모바일 메뉴 패널 -->
+    <div id="mobileMenu" class="lg:hidden hidden border-t border-silver-200/70 bg-silver-50/95 backdrop-blur-xl dark:border-navy-700 dark:bg-navy-900/95">
+      <ul class="mx-auto max-w-content px-5 py-4 space-y-1 text-base font-medium">
+        <li><a href="#about"    class="block rounded-xl px-4 py-3 hover:bg-silver-200/60 dark:hover:bg-navy-800">회사소개</a></li>
+        <li><a href="#business" class="block rounded-xl px-4 py-3 hover:bg-silver-200/60 dark:hover:bg-navy-800">사업분야</a></li>
+        <li><a href="#products" class="block rounded-xl px-4 py-3 hover:bg-silver-200/60 dark:hover:bg-navy-800">솔루션</a></li>
+        <li><a href="#process"  class="block rounded-xl px-4 py-3 hover:bg-silver-200/60 dark:hover:bg-navy-800">진행방식</a></li>
+        <li><a href="#contact"  class="block rounded-xl px-4 py-3 bg-navy-900 text-white dark:bg-gold-500 dark:text-navy-900 text-center font-semibold mt-2">상담 요청</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ============================================================
+         1. HERO SECTION
+         - 딥 네이비 배경 (라이트/다크 모두 브랜드 기본 상태 유지)
+         - 도면 그리드 + 골드 글로우 + 회전하는 정육면체 일러스트
+         ============================================================ -->
+    <section id="top" class="relative isolate overflow-hidden bg-navy-900 text-silver-200 pt-32 pb-24 md:pt-44 md:pb-36" aria-labelledby="hero-title">
+      <!-- 배경 레이어 -->
+      <div class="absolute inset-0 -z-10 bg-grid" aria-hidden="true"></div>
+      <div class="absolute -top-40 left-1/2 -z-10 h-[620px] w-[620px] -translate-x-1/2 rounded-full bg-gold-500/10 blur-[120px]" aria-hidden="true"></div>
+      <div class="absolute bottom-0 inset-x-0 -z-10 h-40 bg-gradient-to-b from-transparent to-navy-950/60" aria-hidden="true"></div>
+
+      <div class="mx-auto grid max-w-content items-center gap-16 px-5 md:px-8 lg:grid-cols-[1.15fr_1fr]">
+        <!-- 카피 영역 -->
+        <div>
+          
+          <h1 id="hero-title" class="reveal text-[40px] leading-[1.12] sm:text-6xl lg:text-[68px] font-black tracking-[-0.035em] text-white" data-delay="1">
+            신뢰를 설계하고,<br />
+            <span class="text-gold-metal">내일을 연결합니다.</span>
+          </h1>
+
+          <p class="reveal mt-7 max-w-xl text-base md:text-lg leading-relaxed text-silver-400" data-delay="2">
+            주식회사 상효는 글로벌 방송·통신 인프라부터 맞춤형 디지털 서비스까지 — 견고한 기술과 정직한 파트너십으로 비즈니스의 기반을 만듭니다.
+          </p>
+
+          <div class="reveal mt-10 flex flex-col sm:flex-row gap-3" data-delay="3">
+            <a href="#contact" class="group inline-flex items-center justify-center gap-2 rounded-full bg-gold-500 px-7 py-4 text-[15px] font-bold text-navy-900 shadow-[0_8px_30px_-6px_rgba(212,175,55,.55)] hover:bg-gold-400 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-300 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-900">
+              프로젝트 상담하기
+              <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </a>
+            <a href="#business" class="inline-flex items-center justify-center gap-2 rounded-full border border-silver-200/20 px-7 py-4 text-[15px] font-semibold text-white hover:border-silver-200/50 hover:bg-white/5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500">
+              사업분야 살펴보기
+            </a>
+          </div>
+
+          <!-- 신뢰 지표 (사실 기반 키워드) -->
+          <dl class="reveal mt-14 grid grid-cols-3 gap-6 max-w-lg border-t border-white/10 pt-8" data-delay="4">
+            <div><dt class="text-xs text-silver-500">사업 영역</dt><dd class="mt-1 text-2xl font-bold text-white">2<span class="text-gold-500">+</span></dd></div>
+            <div><dt class="text-xs text-silver-500">글로벌 파트너</dt><dd class="mt-1 text-2xl font-bold text-white">EU<span class="text-gold-500">·</span>Asia</dd></div>
+            <div><dt class="text-xs text-silver-500">고객 대응</dt><dd class="mt-1 text-2xl font-bold text-white">1:1</dd></div>
+          </dl>
+        </div>
+
+        <!-- 일러스트: 정육면체(土) + 금속 라인(金) + 물결(水) -->
+        <div class="reveal relative mx-auto w-full max-w-[460px]" data-delay="2" aria-hidden="true">
+          <div class="absolute inset-0 rounded-full border border-dashed border-silver-200/10 animate-spin-slow"></div>
+          <div class="absolute inset-10 rounded-full border border-silver-200/10"></div>
+          <!-- 새 로고 대형 버전 (부유 애니메이션) -->
+          <div class="absolute inset-16 rounded-full bg-gold-500/10 blur-3xl"></div>
+          <svg class="relative block w-full aspect-square p-8 animate-float drop-shadow-[0_30px_60px_rgba(0,0,0,.5)]"><use href="#sh-logo" /></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         2. ABOUT — 회사 소개 + 핵심 가치
+         ============================================================ -->
+    <section id="about" class="py-24 md:py-36" aria-labelledby="about-title">
+      <div class="mx-auto max-w-content px-5 md:px-8">
+        <div class="grid gap-14 lg:grid-cols-2 lg:gap-24">
+          <div>
+            <p class="reveal text-sm font-semibold tracking-[0.2em] text-gold-600 dark:text-gold-500">ABOUT SANGHYO</p>
+            <h2 id="about-title" class="reveal mt-4 text-3xl md:text-5xl font-black tracking-[-0.03em] leading-[1.18]" data-delay="1">
+              단단한 기반 위에,<br />예리한 기술을 더합니다.
+            </h2>
+          </div>
+          <div class="reveal space-y-5 text-[17px] leading-[1.85] text-silver-500 dark:text-silver-400" data-delay="2">
+            <p>
+              <strong class="font-semibold text-navy-900 dark:text-white">상효(SANGHYO)</strong>는 흙처럼 단단한 신뢰를 바탕으로,
+              금속처럼 정밀한 기술과 물처럼 유연한 서비스를 지향합니다.
+            </p>
+            <p>
+              유럽·아시아의 검증된 방송·통신 장비와 서버를 국내 방송사와 SI 기업에 공급하고,
+              고객이 디지털 전환을 쉽게 시작할 수 있도록 웹·앱 서비스를 제공합니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- 핵심 가치 카드 -->
+        <ul class="mt-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" role="list">
+          <!-- 카드 공통 템플릿: 아이콘 / 제목 / 설명 -->
+          <li class="reveal spotlight border-gradient rounded-3xl bg-white p-8 shadow-[0_1px_0_rgba(10,25,47,.04),0_20px_50px_-30px_rgba(10,25,47,.25)] dark:bg-navy-800/60 dark:shadow-none" data-delay="1">
+            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-navy-900 text-gold-500 dark:bg-navy-900"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linejoin="round" d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4"/></svg></div>
+            <h3 class="mt-6 text-lg font-bold">Trust</h3>
+            <p class="mt-1 text-sm font-semibold text-gold-600 dark:text-gold-500">신뢰</p>
+            <p class="mt-3 text-[15px] leading-relaxed text-silver-500 dark:text-silver-400">약속한 품질과 일정을 지키는 것. 모든 거래의 출발점입니다.</p>
+          </li>
+          <li class="reveal spotlight border-gradient rounded-3xl bg-white p-8 shadow-[0_1px_0_rgba(10,25,47,.04),0_20px_50px_-30px_rgba(10,25,47,.25)] dark:bg-navy-800/60 dark:shadow-none" data-delay="2">
+            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-navy-900 text-gold-500"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 3h5M12 3v4m-6.4 3.6 2.8 2.8M3 15h4m10 0h4m-2.6-4.4-2.8 2.8M12 21a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z"/></svg></div>
+            <h3 class="mt-6 text-lg font-bold">Precision</h3>
+            <p class="mt-1 text-sm font-semibold text-gold-600 dark:text-gold-500">정밀함</p>
+            <p class="mt-3 text-[15px] leading-relaxed text-silver-500 dark:text-silver-400">장비 선정부터 납품·설치까지, 기술적 디테일을 끝까지 검증합니다.</p>
+          </li>
+          <li class="reveal spotlight border-gradient rounded-3xl bg-white p-8 shadow-[0_1px_0_rgba(10,25,47,.04),0_20px_50px_-30px_rgba(10,25,47,.25)] dark:bg-navy-800/60 dark:shadow-none" data-delay="3">
+            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-navy-900 text-gold-500"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" d="M3 9c3-2 6-2 9 0s6 2 9 0M3 15c3-2 6-2 9 0s6 2 9 0"/></svg></div>
+            <h3 class="mt-6 text-lg font-bold">Flexibility</h3>
+            <p class="mt-1 text-sm font-semibold text-gold-600 dark:text-gold-500">유연함</p>
+            <p class="mt-3 text-[15px] leading-relaxed text-silver-500 dark:text-silver-400">고객의 규모와 상황에 맞춰 가장 현실적인 해법을 제안합니다.</p>
+          </li>
+          <li class="reveal spotlight border-gradient rounded-3xl bg-white p-8 shadow-[0_1px_0_rgba(10,25,47,.04),0_20px_50px_-30px_rgba(10,25,47,.25)] dark:bg-navy-800/60 dark:shadow-none" data-delay="4">
+            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-navy-900 text-gold-500"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v4m0 12v4M2 12h4m12 0h4M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg></div>
+            <h3 class="mt-6 text-lg font-bold">Future</h3>
+            <p class="mt-1 text-sm font-semibold text-gold-600 dark:text-gold-500">미래지향</p>
+            <p class="mt-3 text-[15px] leading-relaxed text-silver-500 dark:text-silver-400">글로벌 기술 흐름을 먼저 읽고, 국내 시장에 가장 빠르게 연결합니다.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         3. FEATURES — 사업분야 (Bento 그리드 6개)
+         ============================================================ -->
+    <section id="business" class="relative py-24 md:py-36 bg-white dark:bg-navy-950/40 border-y border-silver-200 dark:border-navy-800" aria-labelledby="biz-title">
+      <div class="mx-auto max-w-content px-5 md:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="reveal text-sm font-semibold tracking-[0.2em] text-gold-600 dark:text-gold-500">BUSINESS</p>
+          <h2 id="biz-title" class="reveal mt-4 text-3xl md:text-5xl font-black tracking-[-0.03em]" data-delay="1">인프라와 디지털, 하나의 파트너</h2>
+          <p class="reveal mt-5 text-[17px] leading-relaxed text-silver-500 dark:text-silver-400" data-delay="2">인프라·디지털. 비즈니스를 움직이는 핵심 영역을 하나의 파트너가 책임집니다.</p>
+        </div>
+
+        <!-- Bento 레이아웃: 큰 카드 2개 + 작은 카드 4개 -->
+        <div class="mt-16 grid gap-5 md:grid-cols-6">
+
+          <!-- (1) 방송 SI — 대표 사업, 넓은 카드 -->
+          <article class="reveal spotlight border-gradient md:col-span-6 rounded-3xl bg-navy-900 p-8 md:p-10 text-silver-200 overflow-hidden relative" data-delay="1">
+            <div class="absolute -right-16 -bottom-16 h-64 w-64 rounded-full bg-gold-500/10 blur-3xl" aria-hidden="true"></div>
+            <span class="inline-block rounded-full border border-gold-500/40 px-3 py-1 text-xs font-semibold text-gold-400">01 · Broadcast SI</span>
+            <h3 class="mt-6 text-2xl md:text-3xl font-bold text-white tracking-tight">방송·통신 장비 및 서버 공급</h3>
+            <p class="mt-4 max-w-lg leading-relaxed text-silver-400">
+              핀란드 <strong class="text-white font-semibold">Teleste</strong>의 공식 파트너로서 유럽·중국 등 해외의 검증된 방송용 장비와 서버를 수입해
+              국내 방송사업자와 SI 기업에 납품합니다.
+            </p>
+            <ul class="mt-8 flex flex-wrap gap-2 text-sm" role="list">
+              <li class="rounded-full bg-white/5 border border-white/10 px-4 py-1.5">방송 전송 장비</li>
+              <li class="rounded-full bg-white/5 border border-white/10 px-4 py-1.5">서버 · 네트워크</li>
+              <li class="rounded-full bg-white/5 border border-white/10 px-4 py-1.5">설치 · 구축</li>
+              <li class="rounded-full bg-white/5 border border-white/10 px-4 py-1.5">기술 지원</li>
+            </ul>
+          </article>
+
+          <!-- (2) 웹·앱 서비스 -->
+          <article class="reveal spotlight border-gradient md:col-span-3 rounded-3xl bg-silver-100 p-8 dark:bg-navy-800/60" data-delay="1">
+            <span class="text-xs font-semibold text-gold-600 dark:text-gold-500">02 · Digital</span>
+            <div class="mt-6 grid h-12 w-12 place-items-center rounded-2xl bg-navy-900 text-gold-500"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path stroke-linecap="round" d="M8 21h8M9 9l-2 2 2 2m6-4 2 2-2 2"/></svg></div>
+            <h3 class="mt-5 text-xl font-bold">웹·앱 서비스</h3>
+            <p class="mt-3 text-[15px] leading-relaxed text-silver-500 dark:text-silver-400">홈페이지부터 업무용 SaaS까지, 작은 기업에 꼭 맞는 디지털 도구를 만듭니다.</p>
+          </article>
+
+          <!-- (3) 기술 지원 -->
+          <article class="reveal spotlight border-gradient md:col-span-3 rounded-3xl bg-silver-100 p-8 dark:bg-navy-800/60" data-delay="1">
+            <div class="flex items-start gap-5">
+              <div class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-navy-900 text-gold-500"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.6-.6-2.5 2.6-2.4Z"/></svg></div>
+              <div>
+                <h3 class="text-xl font-bold">설치 · 유지보수</h3>
+                <p class="mt-2 text-[15px] leading-relaxed text-silver-500 dark:text-silver-400">납품 이후에도 운영 안정화와 기술 문의에 신속하게 대응합니다.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         4. PRODUCTS — 대표 솔루션 카드
+         ============================================================ -->
+    <section id="products" class="py-24 md:py-36" aria-labelledby="prod-title">
+      <div class="mx-auto max-w-content px-5 md:px-8">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+          <div>
+            <p class="reveal text-sm font-semibold tracking-[0.2em] text-gold-600 dark:text-gold-500">PRODUCTS &amp; SOLUTIONS</p>
+            <h2 id="prod-title" class="reveal mt-4 text-3xl md:text-5xl font-black tracking-[-0.03em]" data-delay="1">상효가 제공하는 솔루션</h2>
+          </div>
+          <p class="reveal max-w-sm text-[15px] leading-relaxed text-silver-500 dark:text-silver-400" data-delay="2">검증된 글로벌 제품과 직접 개발한 서비스로 고객의 문제를 해결합니다.</p>
+        </div>
+
+        <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-6">
+
+          <!-- 카드 1: 원장쌤 -->
+          <article class="reveal group spotlight lg:col-span-3 rounded-3xl border border-silver-200 bg-white overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-30px_rgba(10,25,47,.35)] dark:border-navy-800 dark:bg-navy-800/50" data-delay="1">
+            <!-- 썸네일: 대시보드 미니 일러스트 -->
+            <div class="relative aspect-[16/10] bg-navy-900 p-6 overflow-hidden" aria-hidden="true">
+              <div class="absolute inset-0 bg-grid opacity-60"></div>
+              <div class="relative h-full rounded-xl bg-navy-800 border border-white/10 p-4 transition-transform duration-700 group-hover:scale-[1.03]">
+                <div class="flex gap-1.5"><span class="h-2 w-2 rounded-full bg-white/20"></span><span class="h-2 w-2 rounded-full bg-white/20"></span><span class="h-2 w-2 rounded-full bg-gold-500"></span></div>
+                <div class="mt-4 grid grid-cols-3 gap-2">
+                  <div class="h-10 rounded-md bg-white/5"></div><div class="h-10 rounded-md bg-white/5"></div><div class="h-10 rounded-md bg-gold-500/20 border border-gold-500/30"></div>
+                </div>
+                <div class="mt-3 flex items-end gap-1.5 h-12">
+                  <span class="w-full rounded-sm bg-white/10 h-[40%]"></span><span class="w-full rounded-sm bg-white/10 h-[65%]"></span><span class="w-full rounded-sm bg-white/10 h-[50%]"></span><span class="w-full rounded-sm bg-gold-500/70 h-[90%]"></span><span class="w-full rounded-sm bg-white/10 h-[70%]"></span>
+                </div>
+              </div>
+            </div>
+            <div class="p-7">
+              <p class="text-xs font-semibold text-gold-600 dark:text-gold-500">SaaS · 교육</p>
+              <h3 class="mt-2 text-xl font-bold">원장쌤</h3>
+              <p class="mt-3 text-[15px] leading-relaxed text-silver-500 dark:text-silver-400">원생·출결·수납·상담을 한 화면에서 관리하는 학원 운영 서비스.</p>
+              <a href="https://원장쌤.com" target="_blank" rel="noopener" class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-900 dark:text-white hover:text-gold-600 dark:hover:text-gold-400 transition-colors">
+                서비스 바로가기 <span aria-hidden="true">↗</span><span class="sr-only">(새 창)</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- 카드 2: Teleste 방송 솔루션 -->
+          <article class="reveal group spotlight lg:col-span-3 rounded-3xl border border-silver-200 bg-white overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-30px_rgba(10,25,47,.35)] dark:border-navy-800 dark:bg-navy-800/50" data-delay="2">
+            <div class="relative aspect-[16/10] bg-navy-900 overflow-hidden grid place-items-center" aria-hidden="true">
+              <div class="absolute inset-0 bg-grid opacity-60"></div>
+              <!-- 신호 파형 일러스트 -->
+              <svg viewBox="0 0 240 120" class="relative w-4/5 transition-transform duration-700 group-hover:scale-105">
+                <rect x="20" y="40" width="60" height="40" rx="6" fill="#1B2A4A" stroke="#E2E8F0" stroke-opacity=".25"/>
+                <rect x="160" y="40" width="60" height="40" rx="6" fill="#1B2A4A" stroke="#D4AF37" stroke-opacity=".6"/>
+                <path d="M80 60 q10 -18 20 0 t20 0 t20 0 t20 0" stroke="#D4AF37" stroke-width="2.2" fill="none"/>
+                <circle cx="35" cy="60" r="3" fill="#D4AF37"/><circle cx="205" cy="60" r="3" fill="#E2E8F0"/>
+              </svg>
+            </div>
+            <div class="p-7">
+              <p class="text-xs font-semibold text-gold-600 dark:text-gold-500">Broadcast · Partner</p>
+              <h3 class="mt-2 text-xl font-bold">Teleste 방송 인프라</h3>
+              <p class="mt-3 text-[15px] leading-relaxed text-silver-500 dark:text-silver-400">공식 파트너로서 방송·케이블 네트워크 장비의 도입과 구축을 지원합니다.</p>
+              <a href="#contact" class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-900 dark:text-white hover:text-gold-600 dark:hover:text-gold-400 transition-colors">견적 문의 <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+
+          <!-- 카드 3: 서버 인프라 -->
+          <article class="reveal group spotlight lg:col-span-3 rounded-3xl border border-silver-200 bg-white overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-30px_rgba(10,25,47,.35)] dark:border-navy-800 dark:bg-navy-800/50" data-delay="3">
+            <div class="relative aspect-[16/10] bg-navy-900 overflow-hidden grid place-items-center" aria-hidden="true">
+              <div class="absolute inset-0 bg-grid opacity-60"></div>
+              <div class="relative w-1/2 space-y-2 transition-transform duration-700 group-hover:scale-105">
+                <div class="flex items-center justify-between rounded-md bg-navy-800 border border-white/10 px-3 py-2.5"><span class="h-1.5 w-16 rounded bg-white/15"></span><span class="h-2 w-2 rounded-full bg-gold-500"></span></div>
+                <div class="flex items-center justify-between rounded-md bg-navy-800 border border-white/10 px-3 py-2.5"><span class="h-1.5 w-12 rounded bg-white/15"></span><span class="h-2 w-2 rounded-full bg-emerald-400/80"></span></div>
+                <div class="flex items-center justify-between rounded-md bg-navy-800 border border-white/10 px-3 py-2.5"><span class="h-1.5 w-20 rounded bg-white/15"></span><span class="h-2 w-2 rounded-full bg-emerald-400/80"></span></div>
+              </div>
+            </div>
+            <div class="p-7">
+              <p class="text-xs font-semibold text-gold-600 dark:text-gold-500">Infrastructure</p>
+              <h3 class="mt-2 text-xl font-bold">서버 · 네트워크 장비</h3>
+              <p class="mt-3 text-[15px] leading-relaxed text-silver-500 dark:text-silver-400">방송 및 SI 환경에 최적화된 서버와 네트워크 장비를 합리적으로 공급합니다.</p>
+              <a href="#contact" class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-900 dark:text-white hover:text-gold-600 dark:hover:text-gold-400 transition-colors">견적 문의 <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+
+          <!-- 카드 4: 맞춤형 웹·앱 -->
+          <article class="reveal group spotlight lg:col-span-3 rounded-3xl border border-silver-200 bg-white overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-30px_rgba(10,25,47,.35)] dark:border-navy-800 dark:bg-navy-800/50" data-delay="1">
+            <div class="relative aspect-[16/10] bg-navy-900 overflow-hidden grid place-items-center" aria-hidden="true">
+              <div class="absolute inset-0 bg-grid opacity-60"></div>
+              <div class="relative flex items-end gap-4 transition-transform duration-700 group-hover:scale-105">
+                <div class="h-24 w-36 rounded-lg bg-navy-800 border border-white/10 p-2"><div class="h-2 w-10 rounded bg-gold-500/70"></div><div class="mt-2 h-10 rounded bg-white/5"></div></div>
+                <div class="h-28 w-14 rounded-xl bg-navy-800 border border-gold-500/40 p-1.5"><div class="h-2 w-6 rounded bg-white/20 mx-auto"></div><div class="mt-2 h-14 rounded bg-white/5"></div></div>
+              </div>
+            </div>
+            <div class="p-7">
+              <p class="text-xs font-semibold text-gold-600 dark:text-gold-500">Web · App</p>
+              <h3 class="mt-2 text-xl font-bold">맞춤형 웹·앱 개발</h3>
+              <p class="mt-3 text-[15px] leading-relaxed text-silver-500 dark:text-silver-400">반응형 홈페이지, 예약·고객관리 시스템 등 업종별 맞춤 개발.</p>
+              <a href="#contact" class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-navy-900 dark:text-white hover:text-gold-600 dark:hover:text-gold-400 transition-colors">개발 문의 <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         (추가) PROCESS — 진행 방식 4단계
+         ============================================================ -->
+    <section id="process" class="py-24 md:py-32 bg-navy-900 text-silver-200 relative overflow-hidden" aria-labelledby="process-title">
+      <div class="absolute inset-0 bg-grid opacity-70" aria-hidden="true"></div>
+      <div class="relative mx-auto max-w-content px-5 md:px-8">
+        <p class="reveal text-sm font-semibold tracking-[0.2em] text-gold-500">HOW WE WORK</p>
+        <h2 id="process-title" class="reveal mt-4 text-3xl md:text-5xl font-black tracking-[-0.03em] text-white" data-delay="1">명확한 4단계 프로세스</h2>
+
+        <ol class="mt-16 grid gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+          <li class="reveal bg-navy-900 p-8" data-delay="1">
+            <span class="text-gold-metal text-4xl font-black">01</span>
+            <h3 class="mt-5 text-lg font-bold text-white">상담 · 진단</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-silver-400">요구사항과 현재 환경을 정확히 파악합니다.</p>
+          </li>
+          <li class="reveal bg-navy-900 p-8" data-delay="2">
+            <span class="text-gold-metal text-4xl font-black">02</span>
+            <h3 class="mt-5 text-lg font-bold text-white">제안 · 설계</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-silver-400">예산과 목표에 맞춘 최적의 구성을 제안합니다.</p>
+          </li>
+          <li class="reveal bg-navy-900 p-8" data-delay="3">
+            <span class="text-gold-metal text-4xl font-black">03</span>
+            <h3 class="mt-5 text-lg font-bold text-white">공급 · 구축</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-silver-400">약속한 일정에 맞춰 납품·개발·설치를 진행합니다.</p>
+          </li>
+          <li class="reveal bg-navy-900 p-8" data-delay="4">
+            <span class="text-gold-metal text-4xl font-black">04</span>
+            <h3 class="mt-5 text-lg font-bold text-white">운영 · 지원</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-silver-400">안정화 이후에도 지속적으로 함께합니다.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         5. CONTACT — 안내 문구 + 회사 연락처
+         ============================================================ -->
+    <section id="contact" class="py-24 md:py-36" aria-labelledby="contact-title">
+      <div class="mx-auto max-w-content px-5 md:px-8">
+        <div class="grid gap-12 lg:grid-cols-2 lg:gap-20 lg:items-end">
+
+          <!-- 좌측: 안내 -->
+          <div>
+            <p class="reveal text-sm font-semibold tracking-[0.2em] text-gold-600 dark:text-gold-500">CONTACT</p>
+            <h2 id="contact-title" class="reveal mt-4 text-3xl md:text-5xl font-black tracking-[-0.03em] leading-[1.18]" data-delay="1">함께 만들어갈<br />다음 프로젝트를 들려주세요.</h2>
+            <p class="reveal mt-6 text-[17px] leading-relaxed text-silver-500 dark:text-silver-400" data-delay="2">전화 또는 이메일로 편하게 연락 주세요. 담당자가 직접 응대해 드립니다.</p>
+
+          </div>
+
+          <!-- 우측: 연락처 -->
+          <div>
+            <ul class="reveal space-y-6 rounded-3xl border border-silver-200 bg-white p-8 md:p-10 dark:border-navy-800 dark:bg-navy-800/60" data-delay="3" role="list">
+              <li class="flex items-start gap-4">
+                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-navy-900 text-gold-500"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linejoin="round" d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg></span>
+                <div><p class="text-sm text-silver-500 dark:text-silver-400">전화</p><a href="tel:050713814450" class="text-lg font-semibold hover:text-gold-600 dark:hover:text-gold-400">0507-1381-4450</a></div>
+              </li>
+              <li class="flex items-start gap-4">
+                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-navy-900 text-gold-500"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="m3 7 9 6 9-6"/></svg></span>
+                <div><p class="text-sm text-silver-500 dark:text-silver-400">이메일</p><a href="mailto:admin@sanghyo.com" class="text-lg font-semibold hover:text-gold-600 dark:hover:text-gold-400">admin@sanghyo.com</a></div>
+              </li>
+              <li class="flex items-start gap-4">
+                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-navy-900 text-gold-500"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linejoin="round" d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+                <div><p class="text-sm text-silver-500 dark:text-silver-400">주소</p><address class="not-italic text-[17px] font-semibold leading-snug">인천광역시 영종구 하늘중앙로 197, 102호(중산동)</address></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="bg-navy-950 text-silver-400" role="contentinfo">
+    <div class="mx-auto max-w-content px-5 md:px-8 py-16">
+      <div class="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr]">
+        <div>
+          <div class="flex items-center gap-3">
+            <svg class="h-11 w-11" aria-hidden="true"><use href="#sh-logo" /></svg>
+            <div>
+              <p class="font-bold text-white">주식회사 상효</p>
+              <p class="text-[10px] font-semibold tracking-[0.22em]">SANGHYO CO., LTD.</p>
+            </div>
+          </div>
+          <p class="mt-6 max-w-sm text-sm leading-relaxed">신뢰를 설계하고, 내일을 연결합니다.<br />방송 SI · IT 서비스</p>
+        </div>
+        <nav aria-label="푸터 메뉴">
+          <p class="text-sm font-semibold text-white">메뉴</p>
+          <ul class="mt-4 space-y-2.5 text-sm">
+            <li><a href="#about" class="hover:text-gold-400">회사소개</a></li>
+            <li><a href="#business" class="hover:text-gold-400">사업분야</a></li>
+            <li><a href="#products" class="hover:text-gold-400">솔루션</a></li>
+            <li><a href="#contact" class="hover:text-gold-400">문의하기</a></li>
+          </ul>
+        </nav>
+        <div>
+          <p class="text-sm font-semibold text-white">회사 정보</p>
+          <ul class="mt-4 space-y-2.5 text-sm">
+            <li>인천광역시 영종구 하늘중앙로 197, 102호</li>
+            <li>T. <a href="tel:050713814450" class="hover:text-gold-400">0507-1381-4450</a></li>
+            <li>E. <a href="mailto:admin@sanghyo.com" class="hover:text-gold-400">admin@sanghyo.com</a></li>
+            <!-- 사업자등록번호, 대표자명 등은 확정 후 추가 -->
+          </ul>
+        </div>
+      </div>
+      <div class="mt-14 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs">
+        <p>© <span id="year"></span> SANGHYO CO., LTD. All rights reserved.</p>
+        <div class="flex gap-5"><a href="privacy.html" class="font-semibold text-silver-200 hover:text-gold-400">개인정보처리방침</a><a href="terms.html" class="hover:text-gold-400">이용약관</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 맨 위로 버튼 -->
+  <button id="toTop" type="button" class="fixed bottom-6 right-6 z-40 grid h-12 w-12 place-items-center rounded-full bg-gold-500 text-navy-900 shadow-lg opacity-0 pointer-events-none translate-y-4 transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-300" aria-label="맨 위로 이동">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m-6 6 6-6 6 6"/></svg>
+  </button>
+
+  
+  <!-- ============================================================
+       JAVASCRIPT — 인터랙션
+       ============================================================ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const root = document.documentElement;
+
+      /* 1) 다크모드 토글 + 저장 */
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        const isDark = root.classList.toggle('dark');
+        try { localStorage.setItem('sanghyo-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+      });
+
+      /* 2) 헤더: 스크롤 시 배경 적용 (Hero가 네이비이므로 처음엔 흰 글씨) */
+      const header = document.getElementById('siteHeader');
+      const toTop  = document.getElementById('toTop');
+      const onScroll = () => {
+        const y = window.scrollY;
+        const scrolled = y > 24;
+        header.classList.toggle('header-scrolled', scrolled);
+        header.classList.toggle('bg-silver-50/80', scrolled);
+        header.classList.toggle('dark:bg-navy-900/75', scrolled);
+        header.classList.toggle('border-b', scrolled);
+        header.classList.toggle('border-silver-200/60', scrolled);
+        header.classList.toggle('dark:border-navy-800', scrolled);
+        // Hero 위에서는 텍스트를 밝게
+        header.classList.toggle('text-white', !scrolled);
+        // 맨 위로 버튼 표시
+        const show = y > 600;
+        toTop.classList.toggle('opacity-0', !show);
+        toTop.classList.toggle('pointer-events-none', !show);
+        toTop.classList.toggle('translate-y-4', !show);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+      toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      /* 3) 모바일 메뉴 */
+      const menuBtn = document.getElementById('menuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const menuIcon = document.getElementById('menuIcon');
+      const setMenu = (open) => {
+        mobileMenu.classList.toggle('hidden', !open);
+        menuBtn.setAttribute('aria-expanded', String(open));
+        menuBtn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+        menuIcon.setAttribute('d', open ? 'M6 6l12 12M18 6 6 18' : 'M4 7h16M4 12h16M4 17h16');
+        if (open) header.classList.add('bg-silver-50/95', 'text-navy-900');
+      };
+      menuBtn.addEventListener('click', () => setMenu(menuBtn.getAttribute('aria-expanded') !== 'true'));
+      mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+
+      /* 4) 스크롤 등장 애니메이션 (IntersectionObserver — 가볍고 빠름) */
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) { entry.target.classList.add('is-visible'); io.unobserve(entry.target); }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+      /* 5) 카드 스포트라이트: 마우스 좌표를 CSS 변수로 전달 */
+      document.querySelectorAll('.spotlight').forEach(card => {
+        card.addEventListener('pointermove', e => {
+          const r = card.getBoundingClientRect();
+          card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+          card.style.setProperty('--my', `${e.clientY - r.top}px`);
+        });
+      });
+
+      /* 6) 현재 섹션에 해당하는 메뉴 하이라이트 */
+      const links = document.querySelectorAll('.nav-link');
+      const sectionIO = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          links.forEach(l => {
+            const active = l.getAttribute('href') === '#' + entry.target.id;
+            l.classList.toggle('!text-gold-500', active);
+            if (active) l.setAttribute('aria-current', 'true'); else l.removeAttribute('aria-current');
+          });
+        });
+      }, { rootMargin: '-45% 0px -50% 0px' });
+      ['about', 'business', 'products', 'process', 'contact'].forEach(id => {
+        const s = document.getElementById(id); if (s) sectionIO.observe(s);
+      });
+
+      /* 7) 저작권 연도 자동 표시 */
+      document.getElementById('year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>
