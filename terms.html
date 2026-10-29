@@ -103,7 +103,7 @@
     <div class="mx-auto max-w-content px-5 md:px-8 py-16 md:py-20">
       <p class="text-sm font-semibold tracking-[0.2em] text-gold-500">TERMS OF USE</p>
       <h1 class="mt-4 text-3xl md:text-5xl font-black tracking-[-0.03em] text-white">이용약관</h1>
-      <p class="mt-5 text-silver-400">시행일자: 2026년 10월 26일</p>
+      <p class="mt-5 text-silver-400">시행일자: <span data-edit="effective_date">2026년 10월 26일</span></p>
     </div>
   </div>
 
@@ -127,7 +127,8 @@
         </ol>
       </nav>
 
-      <article class="legal rounded-3xl bg-white p-7 md:p-12 dark:bg-navy-800/50">
+      <!-- 본문: 관리자 페이지에서 HTML로 편집 (data-edit-html) -->
+      <article class="legal rounded-3xl bg-white p-7 md:p-12 dark:bg-navy-800/50" data-edit-html="legal_body">
 
         <section id="t1" class="!mt-0 !pt-0 !border-0">
           <h2>제1조 (목적)</h2>

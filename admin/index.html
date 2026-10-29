@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!--
+  주식회사 상효 — 홈페이지 관리자 (GitHub Pages 전용, 서버 불필요)
+  - 로그인: admin/auth.json 의 해시와 비교 (비밀번호 원문 저장 안 함)
+  - 저장: 비밀번호로 암호화된 GitHub 토큰을 풀어 GitHub API로 직접 커밋
+  - 구성: index.html(화면) · admin.js(동작) · schema.js(편집 항목) · auth.json(계정)
+-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <title>관리자 | 주식회사 상효</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='70 80 540 570'%3E%3Cpolygon points='340,90 580,225 340,355 100,225' fill='%231B2A4A'/%3E%3Cpolygon points='100,225 340,355 340,635 100,497' fill='%230A192F'/%3E%3Cpolygon points='580,225 340,355 340,635 580,497' fill='%23E2E8F0'/%3E%3Cpath d='M538 112 C430 142 170 210 178 268 C186 330 515 360 516 452 C517 530 260 560 93 605' fill='none' stroke='%23D4AF37' stroke-width='28' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      colors: {
+        navy:   { 950: '#060F1F', 900: '#0A192F', 800: '#1B2A4A', 700: '#26385E' },
+        silver: { 50: '#FFFFFF', 100: '#F5F7FA', 200: '#E2E8F0', 400: '#94A3B8', 500: '#64748B' },
+        gold:   { 300: '#E9CD72', 400: '#DDBE52', 500: '#D4AF37', 600: '#B8952A' }
+      },
+      fontFamily: { sans: ['Inter', '"Noto Sans KR"', 'system-ui', 'sans-serif'], mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'] }
+    } } };
+  </script>
+  <style type="text/tailwindcss">
+    body { word-break: keep-all; -webkit-font-smoothing: antialiased; }
+    [hidden] { display: none !important; }
+    .inp { @apply w-full rounded-xl border border-silver-200 bg-white px-3.5 py-2.5 text-[14.5px] text-navy-900 placeholder:text-silver-400 transition focus:border-gold-500 focus:outline-none focus:ring-4 focus:ring-gold-500/15; }
+    .inp.changed { @apply border-gold-500 bg-gold-500/5; }
+    .lbl { @apply mb-1.5 flex items-center gap-2 text-[13px] font-semibold text-navy-800; }
+    .help { @apply mt-1.5 text-xs leading-relaxed text-silver-500; }
+    .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50; }
+    .btn-gold { @apply btn bg-gold-500 text-navy-900 hover:bg-gold-400; }
+    .btn-navy { @apply btn bg-navy-900 text-white hover:bg-navy-800; }
+    .btn-line { @apply btn border border-silver-200 bg-white text-navy-900 hover:border-gold-500; }
+    .card { @apply rounded-2xl border border-silver-200 bg-white p-5 md:p-7 shadow-[0_1px_0_rgba(10,25,47,.04)]; }
+    .navlink { @apply block rounded-lg px-3 py-2 text-sm text-silver-400 hover:bg-white/5 hover:text-white; }
+    .navlink.active { @apply bg-white/10 text-white font-semibold; }
+    .tab { @apply rounded-full px-4 py-2 text-sm font-semibold text-silver-400 hover:text-white whitespace-nowrap; }
+    .tab.active { @apply bg-gold-500 text-navy-900 hover:text-navy-900; }
+    .dot-changed::after { content: ""; @apply ml-1 inline-block h-1.5 w-1.5 rounded-full bg-gold-500 align-middle; }
+    .switch { @apply relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full bg-silver-200 transition; }
+    .switch[aria-checked="true"] { @apply bg-gold-500; }
+    .switch span { @apply inline-block h-5 w-5 translate-x-0.5 rounded-full bg-white shadow transition; }
+    .switch[aria-checked="true"] span { @apply translate-x-[22px]; }
+  </style>
+</head>
+
+<body class="min-h-screen bg-silver-100 font-sans text-navy-900">
+
+  <!-- 로고 심볼 -->
+  <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="shTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1F3157"/><stop offset="1" stop-color="#0E1C38"/></linearGradient>
+      <linearGradient id="shLeft" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B1B33"/><stop offset="1" stop-color="#040B18"/></linearGradient>
+      <linearGradient id="shRight" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1F5F9"/><stop offset="1" stop-color="#CBD5E1"/></linearGradient>
+    </defs>
+    <symbol id="sh-logo" viewBox="70 80 540 570">
+      <polygon points="340,90 580,225 340,355 100,225" fill="url(#shTop)" stroke="#E2E8F0" stroke-opacity=".16" stroke-width="3" stroke-linejoin="round"/>
+      <polygon points="100,225 340,355 340,635 100,497" fill="url(#shLeft)" stroke="#E2E8F0" stroke-opacity=".16" stroke-width="3" stroke-linejoin="round"/>
+      <polygon points="580,225 340,355 340,635 580,497" fill="url(#shRight)"/>
+      <path d="M538 112 C430 142 170 210 178 268 C186 330 515 360 516 452 C517 530 260 560 93 605" fill="none" stroke="#D4AF37" stroke-width="14" stroke-linecap="round"/>
+    </symbol>
+  </svg>
+
+  <!-- ============================== 1. 로그인 ============================== -->
+  <main id="loginView" class="relative grid min-h-screen place-items-center overflow-hidden bg-navy-900 px-5 py-16">
+    <div class="pointer-events-none absolute -top-40 left-1/2 h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-gold-500/10 blur-[120px]" aria-hidden="true"></div>
+    <div class="relative w-full max-w-sm">
+      <div class="mb-8 flex flex-col items-center text-center">
+        <svg class="h-14 w-14" aria-hidden="true"><use href="#sh-logo" /></svg>
+        <h1 class="mt-5 text-2xl font-black tracking-tight text-white">홈페이지 관리자</h1>
+        <p class="mt-1.5 text-sm text-silver-400">주식회사 상효 · SANGHYO CO., LTD.</p>
+      </div>
+      <form id="loginForm" class="rounded-3xl bg-white p-7 shadow-2xl" novalidate>
+        <label for="loginId" class="lbl">아이디</label>
+        <input id="loginId" class="inp" type="email" autocomplete="username" required placeholder="name@sanghyo.com" />
+        <label for="loginPw" class="lbl mt-4">비밀번호</label>
+        <input id="loginPw" class="inp" type="password" autocomplete="current-password" required />
+        <p id="loginError" class="mt-3 hidden text-sm text-red-600" role="alert"></p>
+        <button id="loginBtn" type="submit" class="btn-navy mt-6 w-full py-3">로그인</button>
+      </form>
+      <p class="mt-6 text-center text-xs text-silver-500"><a href="../index.html" class="hover:text-gold-400">← 홈페이지로 돌아가기</a></p>
+    </div>
+  </main>
+
+  <!-- ============================== 2. 최초 GitHub 연결 ============================== -->
+  <main id="setupView" hidden class="min-h-screen bg-navy-900 px-5 py-14">
+    <div class="mx-auto max-w-xl">
+      <div class="mb-6 flex items-center gap-3 text-white">
+        <svg class="h-10 w-10" aria-hidden="true"><use href="#sh-logo" /></svg>
+        <div><p class="text-lg font-bold">GitHub 연결</p><p class="text-sm text-silver-400">처음 한 번만 설정하면 됩니다.</p></div>
+      </div>
+      <form id="setupForm" class="rounded-3xl bg-white p-7 md:p-8" novalidate>
+        <ol class="mb-6 space-y-2 rounded-2xl bg-silver-100 p-4 text-[13px] leading-relaxed text-navy-800">
+          <li><b>1.</b> GitHub → Settings → Developer settings → <b>Fine-grained tokens</b> → Generate new token</li>
+          <li><b>2.</b> Repository access: <b>이 홈페이지 저장소만</b> 선택</li>
+          <li><b>3.</b> Permissions: <b>Contents → Read and write</b> (선택: Pages → Read-only, 배포 상태 표시용)</li>
+          <li><b>4.</b> 생성된 토큰(github_pat_…)을 아래에 붙여넣기</li>
+        </ol>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div><label class="lbl" for="sOwner">GitHub 계정(조직)명</label><input id="sOwner" class="inp" required placeholder="예: sanghyo" /></div>
+          <div><label class="lbl" for="sRepo">저장소 이름</label><input id="sRepo" class="inp" required placeholder="예: sanghyo-website" /></div>
+          <div><label class="lbl" for="sBranch">브랜치</label><input id="sBranch" class="inp" value="main" required /></div>
+          <div><label class="lbl" for="sDir">사이트 폴더</label><input id="sDir" class="inp" placeholder="저장소 최상위면 비워두기 (예: docs)" /></div>
+        </div>
+        <label class="lbl mt-4" for="sToken">GitHub 토큰</label>
+        <input id="sToken" class="inp font-mono" type="password" autocomplete="off" required placeholder="github_pat_…" />
+        <p class="help">토큰은 관리자 비밀번호로 암호화되어 저장소의 admin/auth.json에 저장됩니다. 원문은 어디에도 저장되지 않습니다.</p>
+        <p id="setupError" class="mt-3 hidden text-sm text-red-600" role="alert"></p>
+        <div class="mt-6 flex flex-wrap gap-2">
+          <button id="setupBtn" type="submit" class="btn-gold">연결 확인 후 저장</button>
+          <button type="button" class="btn-line js-logout">로그아웃</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- ============================== 3. 편집 화면 ============================== -->
+  <div id="appView" hidden class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
+
+    <!-- 사이드바 -->
+    <aside class="bg-navy-900 text-white lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
+      <div class="flex items-center justify-between gap-3 px-5 py-5">
+        <a href="../index.html" target="_blank" rel="noopener" class="flex items-center gap-3">
+          <svg class="h-9 w-9" aria-hidden="true"><use href="#sh-logo" /></svg>
+          <span class="leading-tight"><span class="block text-sm font-bold">상효 관리자</span><span id="repoLabel" class="block max-w-[150px] truncate text-[11px] text-silver-400"></span></span>
+        </a>
+        <button type="button" class="btn rounded-full border border-white/15 px-3 py-1.5 text-xs text-silver-200 hover:border-gold-500 lg:hidden js-logout">로그아웃</button>
+      </div>
+      <!-- 페이지 선택 -->
+      <div class="px-4">
+        <p class="px-1 pb-2 text-[11px] font-semibold tracking-[0.18em] text-silver-500">PAGES</p>
+        <div id="pageTabs" class="flex gap-1 overflow-x-auto pb-2 lg:flex-col"></div>
+      </div>
+      <!-- 섹션 바로가기 (PC) -->
+      <nav class="hidden px-4 pt-4 lg:block" aria-label="섹션">
+        <p class="px-1 pb-2 text-[11px] font-semibold tracking-[0.18em] text-silver-500">SECTIONS</p>
+        <div id="sectionNav" class="space-y-0.5"></div>
+      </nav>
+      <div class="hidden space-y-1 px-4 py-6 lg:block">
+        <button type="button" class="navlink w-full text-left" data-open-settings="password">비밀번호 변경</button>
+        <button type="button" class="navlink w-full text-left" data-open-settings="github">GitHub 연결 설정</button>
+        <button type="button" class="navlink w-full text-left" data-open-settings="history">변경 이력</button>
+        <button type="button" class="navlink w-full text-left js-logout">로그아웃</button>
+      </div>
+    </aside>
+
+    <!-- 본문 -->
+    <div class="min-w-0">
+      <header class="sticky top-0 z-30 border-b border-silver-200 bg-silver-100/90 backdrop-blur">
+        <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-3.5 md:px-8">
+          <div>
+            <h2 id="pageTitle" class="text-lg font-bold"></h2>
+            <p id="pageMeta" class="text-xs text-silver-500"></p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" class="btn-line lg:hidden" data-open-settings="password">설정</button>
+            <a id="viewSiteBtn" href="../index.html" target="_blank" rel="noopener" class="btn-line">사이트 보기 ↗</a>
+          </div>
+        </div>
+        <div id="initialBanner" hidden class="border-t border-gold-500/30 bg-gold-500/10">
+          <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-5 py-2.5 text-[13px] md:px-8">
+            <span>⚠️ 초기 비밀번호를 사용 중입니다. 보안을 위해 지금 변경해 주세요.</span>
+            <button type="button" class="font-semibold text-gold-600 underline underline-offset-4" data-open-settings="password">비밀번호 변경</button>
+          </div>
+        </div>
+      </header>
+
+      <main id="editor" class="mx-auto max-w-5xl space-y-6 px-5 pb-40 pt-6 md:px-8"></main>
+
+      <!-- 하단 저장 바 -->
+      <div class="fixed inset-x-0 bottom-0 z-40 lg:left-[260px]">
+        <div class="mx-auto max-w-5xl px-5 pb-5 md:px-8">
+          <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-navy-900 px-5 py-3.5 text-white shadow-2xl">
+            <p id="saveStatus" class="text-sm text-silver-200" aria-live="polite">변경 사항 없음</p>
+            <div class="flex gap-2">
+              <button id="resetBtn" type="button" class="btn border border-white/20 text-white hover:border-gold-500" disabled>되돌리기</button>
+              <button id="saveBtn" type="button" class="btn-gold" disabled>저장 및 게시</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================== 설정 대화상자 ============================== -->
+  <dialog id="settingsDialog" class="w-[min(640px,calc(100vw-24px))] rounded-3xl p-0 backdrop:bg-navy-950/60 backdrop:backdrop-blur-sm">
+    <div class="flex items-center justify-between border-b border-silver-200 px-6 py-4">
+      <div class="flex gap-1 rounded-full bg-silver-100 p-1 text-sm" role="tablist">
+        <button type="button" class="stab rounded-full px-4 py-1.5 font-semibold" data-stab="password">비밀번호</button>
+        <button type="button" class="stab rounded-full px-4 py-1.5 font-semibold" data-stab="github">GitHub</button>
+        <button type="button" class="stab rounded-full px-4 py-1.5 font-semibold" data-stab="history">변경 이력</button>
+      </div>
+      <button type="button" id="closeSettings" class="grid h-9 w-9 place-items-center rounded-full hover:bg-silver-100" aria-label="닫기">✕</button>
+    </div>
+
+    <!-- 비밀번호 변경 -->
+    <form id="pwForm" data-spanel="password" class="space-y-4 p-6" novalidate>
+      <div><label class="lbl" for="pwCurrent">현재 비밀번호</label><input id="pwCurrent" class="inp" type="password" autocomplete="current-password" required /></div>
+      <div><label class="lbl" for="pwNewId">아이디 (변경 시에만 입력)</label><input id="pwNewId" class="inp" type="email" autocomplete="username" placeholder="그대로 두려면 비워두기" /></div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div><label class="lbl" for="pwNew">새 비밀번호</label><input id="pwNew" class="inp" type="password" autocomplete="new-password" required /></div>
+        <div><label class="lbl" for="pwNew2">새 비밀번호 확인</label><input id="pwNew2" class="inp" type="password" autocomplete="new-password" required /></div>
+      </div>
+      <p class="help">12자 이상, 영문·숫자·특수문자를 섞어 주세요. 계정 정보는 공개 저장소에 저장되므로 길고 추측하기 어려운 비밀번호가 중요합니다.</p>
+      <p id="pwMsg" class="hidden text-sm" role="status"></p>
+      <button id="pwBtn" type="submit" class="btn-navy">변경 저장</button>
+    </form>
+
+    <!-- GitHub 설정 -->
+    <form id="ghForm" data-spanel="github" class="space-y-4 p-6" novalidate hidden>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div><label class="lbl" for="gOwner">GitHub 계정(조직)명</label><input id="gOwner" class="inp" required /></div>
+        <div><label class="lbl" for="gRepo">저장소 이름</label><input id="gRepo" class="inp" required /></div>
+        <div><label class="lbl" for="gBranch">브랜치</label><input id="gBranch" class="inp" required /></div>
+        <div><label class="lbl" for="gDir">사이트 폴더</label><input id="gDir" class="inp" placeholder="최상위면 비워두기" /></div>
+      </div>
+      <div><label class="lbl" for="gToken">새 토큰 (교체 시에만 입력)</label><input id="gToken" class="inp font-mono" type="password" autocomplete="off" placeholder="github_pat_…" /></div>
+      <p class="help">토큰이 만료되었거나 저장소를 옮겼을 때 사용합니다.</p>
+      <p id="ghMsg" class="hidden text-sm" role="status"></p>
+      <button id="ghBtn" type="submit" class="btn-navy">연결 확인 후 저장</button>
+    </form>
+
+    <!-- 변경 이력 -->
+    <div data-spanel="history" class="p-6" hidden>
+      <p class="help !mt-0 mb-4">저장할 때마다 GitHub에 기록이 남습니다. 이전 상태로 되돌리려면 GitHub에서 해당 커밋을 Revert 하세요.</p>
+      <ul id="historyList" class="divide-y divide-silver-200 text-sm"></ul>
+    </div>
+  </dialog>
+
+  <!-- 알림 토스트 -->
+  <div id="toast" class="pointer-events-none fixed left-1/2 top-5 z-[60] -translate-x-1/2 opacity-0 transition-opacity duration-300">
+    <div id="toastInner" class="rounded-full bg-navy-900 px-5 py-2.5 text-sm font-semibold text-white shadow-xl"></div>
+  </div>
+
+  <script src="schema.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
